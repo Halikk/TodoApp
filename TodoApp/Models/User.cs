@@ -8,6 +8,6 @@
         public string PasswordHash { get; set; }
 
         // Kullanıcının görevleri
-        public virtual ICollection<TodoItem> TodoItems { get; set; }
+        public virtual ICollection<TodoItem>? TodoItems { get; set; }
     }
 }
