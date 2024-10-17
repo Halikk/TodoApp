@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TodoApp.Interfaces;
 using TodoApp.Models;
 
@@ -6,12 +7,13 @@ namespace TodoApp.Controllers
 {
     // User Controller
     [ApiController]
-    [Route("api/[controller]")]
-    public class UsersController : ControllerBase
+
+    [Route("admin/[controller]")]
+    public class UsersApiController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
 
-        public UsersController(IUserRepository userRepository)
+        public UsersApiController(IUserRepository userRepository)
         {
             _userRepository = userRepository;
         }
