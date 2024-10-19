@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TodoApp.Interfaces;
 using TodoApp.Models;
+using TodoApp.Repositories;
 
 
 [Route("admin/[controller]")]
@@ -34,8 +35,60 @@ public class UsersController : Controller
             await _userRepository.AddUserAsync(user);
             return RedirectToAction(nameof(Index));
         }
-        return View(user);  // Eğer model geçersizse tekrar formu gösterir
+        return View(user);  
     }
 
-    // Benzer şekilde `Edit`, `Delete` gibi action metodlarını da yazmalısınız.
+    [HttpGet("update/{id}")]
+    public async Task<IActionResult> Update(int id)
+    {
+        var user = await _userRepository.GetUserByIdAsync(id);
+        if (user == null)
+        {
+            return NotFound();
+        }
+        return View(user);
+    }
+
+    [HttpPost("update/{id}")]
+    public async Task<IActionResult> Update(int id, User user)
+    {
+        if (id != user.UserId)
+        {
+            return BadRequest();
+        }
+
+        if (ModelState.IsValid)
+        {
+            try
+            {
+                await _userRepository.UpdateUserAsync(user);
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                // Güncelleme sırasında bir hata oluştuysa bu hatayı loglayın
+                Console.WriteLine($"Güncelleme sırasında bir hata oluştu: {ex.Message}");
+            }
+        }
+        return View(user);
+    }
+
+    [HttpGet("delete/{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var user = await _userRepository.GetUserByIdAsync(id);
+        if (user == null)
+        {
+            return NotFound();
+        }
+        return View(user);
+    }
+
+    [HttpPost("delete/{id}")]
+    public async Task<IActionResult> DeleteConfirmed(int id)
+    {
+        await _userRepository.DeleteUserAsync(id);
+        return RedirectToAction(nameof(Index));
+    }
+
 }

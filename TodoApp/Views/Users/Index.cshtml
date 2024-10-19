@@ -23,7 +23,7 @@
                 <td>@user.UserName</td>
                 <td>@user.Email</td>
                 <td>
-                    <a href="@Url.Action("Edit", new { id = user.UserId })">Düzenle</a> |
+                    <a href="@Url.Action("Update", new { id = user.UserId })">Düzenle</a> |
                     <a href="@Url.Action("Delete", new { id = user.UserId })">Sil</a>
                 </td>
             </tr>

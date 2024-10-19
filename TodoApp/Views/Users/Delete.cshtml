@@ -1,0 +1,21 @@
+﻿@model TodoApp.Models.User
+
+@{
+    ViewData["Title"] = "Kullanıcı Sil";
+}
+
+<h2>Kullanıcı Sil</h2>
+
+<h3>Bu kullanıcıyı silmek istediğinize emin misiniz?</h3>
+<div>
+    <h4>@Model.UserName</h4>
+    <p>Email: @Model.Email</p>
+</div>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="UserId" />
+    <div class="form-group">
+        <input type="submit" value="Sil" class="btn btn-danger" /> |
+        <a asp-action="Index" class="btn btn-secondary">İptal</a>
+    </div>
+</form>
