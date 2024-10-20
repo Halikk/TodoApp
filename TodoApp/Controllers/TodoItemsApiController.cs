@@ -6,11 +6,11 @@ namespace TodoApp.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class TodoItemsController : ControllerBase
+    public class TodoItemsApiController : ControllerBase
     {
         private readonly ITodoItemRepository _todoItemRepository;
 
-        public TodoItemsController(ITodoItemRepository todoItemRepository)
+        public TodoItemsApiController(ITodoItemRepository todoItemRepository)
         {
             _todoItemRepository = todoItemRepository;
         }

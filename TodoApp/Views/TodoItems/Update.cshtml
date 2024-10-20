@@ -1,0 +1,40 @@
+﻿@model TodoApp.Models.TodoItem
+
+@{
+    ViewData["Title"] = "Todo Güncelle";
+}
+
+<h2>Todo Güncelle</h2>
+
+<form asp-action="Update" asp-route-id="@Model.TodoItemId" method="post">
+    @Html.AntiForgeryToken() <!-- CSRF koruması için -->
+    <input type="hidden" asp-for="TodoItemId" />
+    <div class="form-group">
+        <label for="Title">Başlık</label>
+        <input type="text" class="form-control" id="Title" name="Title" value="@Model.Title" required />
+    </div>
+
+    <div class="form-group">
+        <label for="Description">Açıklama</label>
+        <textarea class="form-control" id="Description" name="Description" rows="3" required>@Model.Description</textarea>
+    </div>
+
+    <div class="form-group">
+        <label for="IsCompleted">Tamamlandı mı?</label>
+        @Html.DropDownListFor(model => model.IsCompleted, (SelectList)ViewBag.IsCompletedList, new { @class = "form-control" })
+    </div>
+
+    <div class="form-group">
+        <label for="DueDate">Bitiş Tarihi</label>
+        <input type="datetime-local" class="form-control" id="DueDate" name="DueDate"
+               value="@(Model.DueDate.HasValue ? Model.DueDate.Value.ToString("yyyy-MM-ddTHH:mm") : string.Empty)" />
+    </div>
+
+    <div class="form-group">
+        <label for="UserId">Kullanıcı ID</label>
+        <input type="number" class="form-control" id="UserId" name="UserId" value="@Model.UserId" required />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Güncelle</button>
+    <a href="@Url.Action("Index")" class="btn btn-secondary">İptal</a>
+</form>
