@@ -4,15 +4,26 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using TodoApp.Interfaces;
 using TodoApp.Repositories;
-
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
+using TodoApp.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Veritabaný baðlantý dizesini kullanarak DbContext'i ekleyin
 builder.Services.AddDbContext<TodoDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Identity yapýlandýrmasý: Kullanýcý ve Roller için (int ID ile)
+builder.Services.AddIdentity<User, IdentityRole<int>>()  // int türünde Id kullanýmý
+    .AddEntityFrameworkStores<TodoDbContext>()
+    .AddDefaultTokenProviders();
+
+// Kullanýcý ve TodoItem Repository'leri
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ITodoItemRepository, TodoItemRepository>();
+
+// JSON seçenekleriyle birlikte MVC desteði ekleyin
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -20,9 +31,10 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.WriteIndented = true;
     });
 
-
 // MVC desteði ekleyin
 builder.Services.AddControllersWithViews();
+
+// Swagger desteði
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
@@ -46,10 +58,15 @@ else
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-app.UseRouting();
-app.UseAuthorization();
-app.UseAuthentication();
 
+// Routing middleware'i
+app.UseRouting();
+
+// Authentication ve Authorization middleware'lerini doðru sýrayla kullanýn
+app.UseAuthentication(); // Kimlik doðrulama iþlemi
+app.UseAuthorization();  // Yetkilendirme iþlemi
+
+// Default route
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");

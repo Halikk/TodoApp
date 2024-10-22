@@ -9,5 +9,6 @@ namespace TodoApp.Interfaces
         Task AddTodoItemAsync(TodoItem todoItem);
         Task UpdateTodoItemAsync(TodoItem todoItem);
         Task DeleteTodoItemAsync(int id);
+        public Task<IEnumerable<TodoItem>> GetTodoItemsByUserIdAsync(int userId);
     }
 }

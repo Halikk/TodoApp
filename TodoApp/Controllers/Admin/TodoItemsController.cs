@@ -3,17 +3,24 @@ using TodoApp.Interfaces;
 using TodoApp.Models;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace TodoApp.Controllers
 {
+    [Authorize]
     [Route("admin/[controller]")]
     public class TodoItemsController : Controller
     {
         private readonly ITodoItemRepository _todoItemRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public TodoItemsController(ITodoItemRepository todoItemRepository)
+        public TodoItemsController(ITodoItemRepository todoItemRepository, IUserRepository userRepository, IHttpContextAccessor httpContextAccessor)
         {
             _todoItemRepository = todoItemRepository;
+            _userRepository = userRepository;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         // Tüm TodoItem'ları listelemek için Index view'ı döner
@@ -121,6 +128,24 @@ namespace TodoApp.Controllers
         {
             await _todoItemRepository.DeleteTodoItemAsync(id);
             return RedirectToAction(nameof(Index)); // Listeye geri döner
+        }
+        public async Task<IActionResult> MyProjects()
+        {
+            var userId = int.Parse(_httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var todoItems = await _todoItemRepository.GetTodoItemsByUserIdAsync(userId);
+            return View(todoItems);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> MarkAsCompleted(int id)
+        {
+            var todoItem = await _todoItemRepository.GetTodoItemByIdAsync(id);
+            if (todoItem != null && todoItem.UserId == int.Parse(_httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value))
+            {
+                todoItem.IsCompleted = !todoItem.IsCompleted;
+                await _todoItemRepository.UpdateTodoItemAsync(todoItem);
+            }
+            return RedirectToAction("MyProjects");
         }
     }
 }

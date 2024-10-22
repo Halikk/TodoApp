@@ -52,7 +52,7 @@ public class UsersController : Controller
     [HttpPost("update/{id}")]
     public async Task<IActionResult> Update(int id, User user)
     {
-        if (id != user.UserId)
+        if (id != user.Id)
         {
             return BadRequest();
         }

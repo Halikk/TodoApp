@@ -44,5 +44,9 @@ namespace TodoApp.Repositories
                 await _context.SaveChangesAsync();
             }
         }
+        public async Task<IEnumerable<TodoItem>> GetTodoItemsByUserIdAsync(int userId)
+        {
+            return await _context.TodoItems.Where(t => t.UserId == userId).ToListAsync();
+        }
     }
 }

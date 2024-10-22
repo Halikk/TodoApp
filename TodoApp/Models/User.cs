@@ -1,12 +1,11 @@
-﻿namespace TodoApp.Models
-{
-    public class User
-    {
-        public int UserId { get; set; }
-        public string UserName { get; set; }
-        public string Email { get; set; }
-        public string PasswordHash { get; set; }
+﻿using Microsoft.AspNetCore.Identity;
+using System.Collections.Generic;
 
+namespace TodoApp.Models
+{
+    // IdentityUser<int> sınıfından türeyen User sınıfı
+    public class User : IdentityUser<int>
+    {
         // Kullanıcının görevleri
         public virtual ICollection<TodoItem>? TodoItems { get; set; }
     }

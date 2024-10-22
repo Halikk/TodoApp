@@ -40,13 +40,13 @@ namespace TodoApp.Controllers
         public async Task<IActionResult> AddUser(User user)
         {
             await _userRepository.AddUserAsync(user);
-            return CreatedAtAction(nameof(GetUserById), new { id = user.UserId }, user);
+            return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, user);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(int id, User user)
         {
-            if (id != user.UserId)
+            if (id != user.Id)
             {
                 return BadRequest();
             }

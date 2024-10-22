@@ -23,8 +23,8 @@
                 <td>@user.UserName</td>
                 <td>@user.Email</td>
                 <td>
-                    <a href="@Url.Action("Update", new { id = user.UserId })">Düzenle</a> |
-                    <a href="@Url.Action("Delete", new { id = user.UserId })">Sil</a>
+                    <a href="@Url.Action("Update", new { id = user.Id })">Düzenle</a> |
+                    <a href="@Url.Action("Delete", new { id = user.Id })">Sil</a>
                 </td>
             </tr>
         }
