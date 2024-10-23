@@ -18,6 +18,6 @@ public class TodoDbContext : IdentityDbContext<User, IdentityRole<int>, int>  //
         modelBuilder.Entity<User>()
             .HasMany(u => u.TodoItems)
             .WithOne(t => t.User)
-            .HasForeignKey(t => t.UserId);
+            .HasForeignKey(t => t.UserRef);
     }
 }

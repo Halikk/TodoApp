@@ -169,14 +169,14 @@ namespace TodoApp.Migrations
                     IsCompleted = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DueDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    UserId = table.Column<int>(type: "int", nullable: false)
+                    UserRef = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_TodoItems", x => x.TodoItemId);
                     table.ForeignKey(
-                        name: "FK_TodoItems_AspNetUsers_UserId",
-                        column: x => x.UserId,
+                        name: "FK_TodoItems_AspNetUsers_UserRef",
+                        column: x => x.UserRef,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -222,9 +222,9 @@ namespace TodoApp.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TodoItems_UserId",
+                name: "IX_TodoItems_UserRef",
                 table: "TodoItems",
-                column: "UserId");
+                column: "UserRef");
         }
 
         /// <inheritdoc />

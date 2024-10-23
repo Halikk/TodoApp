@@ -20,8 +20,9 @@
     </div>
 
     <div class="form-group">
-        <label for="IsCompleted">Tamamlandı mı?</label>
-        @Html.DropDownListFor(model => model.IsCompleted, (SelectList)ViewBag.IsCompletedList, new { @class = "form-control" })
+        <label asp-for="IsCompleted"></label>
+        @Html.DropDownListFor(model => model.IsCompleted, (IEnumerable<SelectListItem>)ViewBag.IsCompletedList, new { @class = "form-control" })
+        <span asp-validation-for="IsCompleted" class="text-danger"></span>
     </div>
 
     <div class="form-group">
@@ -32,7 +33,7 @@
 
     <div class="form-group">
         <label for="UserId">Kullanıcı ID</label>
-        <input type="number" class="form-control" id="UserId" name="UserId" value="@Model.UserId" required />
+        <input type="number" class="form-control" id="UserId" name="UserId" value="@Model.UserRef" required />
     </div>
 
     <button type="submit" class="btn btn-primary">Güncelle</button>

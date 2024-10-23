@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace TodoApp.Migrations
 {
     [DbContext(typeof(TodoDbContext))]
-    [Migration("20241022203937_InitialCreate")]
+    [Migration("20241022213049_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -182,12 +182,12 @@ namespace TodoApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserId")
+                    b.Property<int>("UserRef")
                         .HasColumnType("int");
 
                     b.HasKey("TodoItemId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserRef");
 
                     b.ToTable("TodoItems");
                 });
@@ -315,7 +315,7 @@ namespace TodoApp.Migrations
                 {
                     b.HasOne("TodoApp.Models.User", "User")
                         .WithMany("TodoItems")
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("UserRef")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

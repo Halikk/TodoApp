@@ -10,5 +10,7 @@ namespace TodoApp.Interfaces
         Task UpdateUserAsync(User user);
         Task DeleteUserAsync(int id);
         Task<User> GetUserByEmailAsync(string email);
+        Task<User> GetUserByUserNameAsync(string userName);
+        Task GetUserByIdAsync(string? userId);
     }
 }

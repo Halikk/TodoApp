@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
 
 namespace TodoApp.Controllers
 {
@@ -15,13 +16,17 @@ namespace TodoApp.Controllers
         private readonly ITodoItemRepository _todoItemRepository;
         private readonly IUserRepository _userRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly UserManager<User> _userManager;
 
-        public TodoItemsController(ITodoItemRepository todoItemRepository, IUserRepository userRepository, IHttpContextAccessor httpContextAccessor)
+        public TodoItemsController(ITodoItemRepository todoItemRepository, IUserRepository userRepository, IHttpContextAccessor httpContextAccessor, UserManager<User> userManager)
         {
             _todoItemRepository = todoItemRepository;
             _userRepository = userRepository;
             _httpContextAccessor = httpContextAccessor;
+            _userManager = userManager;
         }
+       
+
 
         // Tüm TodoItem'ları listelemek için Index view'ı döner
         [HttpGet]
@@ -50,17 +55,33 @@ namespace TodoApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _todoItemRepository.AddTodoItemAsync(todoItem);
-                return RedirectToAction(nameof(Index));
+                // Oturum açmış kullanıcının bilgilerini alıyoruz
+                var currentUser = await _userManager.GetUserAsync(User);  // Oturum açmış kullanıcıyı al
+
+                if (currentUser != null)
+                {
+                    // Kullanıcıyı TodoItem ile ilişkilendiriyoruz
+                    todoItem.UserRef = currentUser.Id;  // currentUser.Id kullanıcının ID'si
+
+                    // Veritabanına ekleyip kaydediyoruz
+                    await _todoItemRepository.AddTodoItemAsync(todoItem);
+
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    ModelState.AddModelError("", "Kullanıcı bulunamadı.");
+                }
             }
-            return View(todoItem); // Hata varsa formu tekrar döndürür
+            return View(todoItem);
         }
+
 
         // TodoItem güncelleme sayfasını gösterir
         [HttpGet("update/{id}")]
-        public IActionResult Update(int id)
+        public async Task<IActionResult> Update(int id)
         {
-            var todoItem = _todoItemRepository.GetTodoItemByIdAsync(id).Result;
+            var todoItem = await _todoItemRepository.GetTodoItemByIdAsync(id);
 
             if (todoItem == null)
             {
@@ -68,46 +89,53 @@ namespace TodoApp.Controllers
             }
 
             // Dropdown için seçenekleri ayarlıyoruz (true = Evet, false = Hayır)
-            ViewBag.IsCompletedList = new SelectList(new List<SelectListItem>
+            ViewBag.IsCompletedList = new List<SelectListItem>
     {
-        new SelectListItem { Text = "Hayır", Value = "false" },
-        new SelectListItem { Text = "Evet", Value = "true" }
-    }, "Value", "Text", todoItem.IsCompleted ? "true" : "false");
+        new SelectListItem { Text = "Evet", Value = "true", Selected = todoItem.IsCompleted },
+        new SelectListItem { Text = "Hayır", Value = "false", Selected = !todoItem.IsCompleted }
+    };
 
             return View(todoItem);
         }
+
+
 
 
         [HttpPost("update/{id}")]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update(int id, TodoItem todoItem)
         {
-            // ID eşleşmesini kontrol et
-            if (id != todoItem.TodoItemId)
-            {
-                return BadRequest(); // Eğer ID'ler uyuşmazsa hata döndür
-            }
-
-            // Model doğrulama hatası olup olmadığını kontrol et
             if (ModelState.IsValid)
             {
-                try
+                // Oturum açmış kullanıcının kimliğini doğruluyoruz
+
+                var currentUser = await _userRepository.GetUserByUserNameAsync(User.Identity.Name);
+
+                if (currentUser != null)
                 {
-                    // Veritabanında güncelleme işlemini gerçekleştir
+                    // Kullanıcının Id'sini TodoItem modeline atıyoruz
+                    todoItem.UserRef = currentUser.Id;
+
+                    // TodoItem'ı güncelliyoruz
                     await _todoItemRepository.UpdateTodoItemAsync(todoItem);
-                    // Başarılı olursa Index sayfasına yönlendir
+
                     return RedirectToAction(nameof(Index));
                 }
-                catch (Exception ex)
+                else
                 {
-                    // Eğer bir hata olursa logla ve hata mesajı göster
-                    ModelState.AddModelError(string.Empty, $"Güncelleme sırasında bir hata oluştu: {ex.Message}");
+                    ModelState.AddModelError("", "Kullanıcı bulunamadı.");
                 }
             }
 
-            // Hatalı veri girildiyse formu tekrar kullanıcıya göster
+            // Eğer validasyon hatası varsa, dropdown listesi yeniden doldurulmalı
+            ViewBag.IsCompletedList = new List<SelectListItem>
+    {
+        new SelectListItem { Text = "Evet", Value = "true", Selected = todoItem.IsCompleted },
+        new SelectListItem { Text = "Hayır", Value = "false", Selected = !todoItem.IsCompleted }
+    };
+
             return View(todoItem);
         }
+
 
 
         // TodoItem silme sayfasını gösterir
@@ -140,7 +168,7 @@ namespace TodoApp.Controllers
         public async Task<IActionResult> MarkAsCompleted(int id)
         {
             var todoItem = await _todoItemRepository.GetTodoItemByIdAsync(id);
-            if (todoItem != null && todoItem.UserId == int.Parse(_httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value))
+            if (todoItem != null && todoItem.UserRef == int.Parse(_httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value))
             {
                 todoItem.IsCompleted = !todoItem.IsCompleted;
                 await _todoItemRepository.UpdateTodoItemAsync(todoItem);

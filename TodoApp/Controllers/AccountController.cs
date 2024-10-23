@@ -32,8 +32,9 @@ public class AccountController : Controller
             {
                 UserName = model.UserName,
                 Email = model.Email,
+                SecurityStamp = Guid.NewGuid().ToString(),
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password) // Şifreyi hashleyin
-            };
+            }; 
 
             // Kullanıcıyı veritabanına kaydedin
             await _userRepository.AddUserAsync(user);

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using TodoApp.Interfaces;
 using TodoApp.Models;
 using TodoApp.Repositories;
@@ -24,7 +25,7 @@ public class UsersController : Controller
     [HttpGet("create")]
     public IActionResult Create()
     {
-        return View();  // Boş formu döndürür
+        return View();
     }
 
     [HttpPost("create")]

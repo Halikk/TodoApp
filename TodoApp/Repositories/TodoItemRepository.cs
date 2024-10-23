@@ -46,7 +46,7 @@ namespace TodoApp.Repositories
         }
         public async Task<IEnumerable<TodoItem>> GetTodoItemsByUserIdAsync(int userId)
         {
-            return await _context.TodoItems.Where(t => t.UserId == userId).ToListAsync();
+            return await _context.TodoItems.Where(t => t.UserRef == userId).ToListAsync();
         }
     }
 }

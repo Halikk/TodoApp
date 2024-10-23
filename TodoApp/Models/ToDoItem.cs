@@ -10,7 +10,7 @@
         public DateTime? DueDate { get; set; }
 
         // Hangi kullanıcıya ait olduğunu belirtir
-        public int UserId { get; set; }
+        public int UserRef { get; set; }
         public virtual User? User { get; set; }
     }
 }

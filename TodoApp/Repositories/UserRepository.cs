@@ -49,5 +49,15 @@ namespace TodoApp.Repositories
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
         }
+        public async Task<User> GetUserByUserNameAsync(string userName)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.UserName == userName);
+        }
+
+
+        public Task GetUserByIdAsync(string? userId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
