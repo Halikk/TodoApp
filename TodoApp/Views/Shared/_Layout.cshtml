@@ -18,13 +18,7 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
+                    <ul class="navbar-nav flex-grow-1">                        
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Index">Kullanıcılar</a>
                         </li>
@@ -32,14 +26,22 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="TodoItems" asp-action="Index">Yapılacak İşler Listesi</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="TodoItems" asp-action="MyProjects">Yapacaklarım</a>
+                            <!-- Kullanıcı oturum açmamışsa Giriş ve Kayıt Ol linklerini göster -->
+                            @if (!User.Identity.IsAuthenticated)
+                            {
+                                <a class="nav-link text-dark d-inline-block" asp-controller="Account" asp-action="Login">Giriş</a>
+                                <a class="nav-link text-dark d-inline-block" asp-controller="Account" asp-action="Register">Kayıt Ol</a>
+                            }
+                            else
+                            {
+                                <!-- Kullanıcı oturum açmışsa Çıkış butonunu göster -->
+                                <form asp-controller="Account" asp-action="Logout" method="post" style="display: inline;">
+                                    <a class="nav-link text-dark d-inline-block" asp-area="" asp-controller="TodoItems" asp-action="MyProjects">Yapacaklarım</a>
+                                    <button type="submit" class="nav-link text-dark d-inline-block">Çıkış</button>
+                                </form>
+                            }
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Giriş yap</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Register">Kayıt ol</a>
-                        </li>
+
                     </ul>
                 </div>
             </div>

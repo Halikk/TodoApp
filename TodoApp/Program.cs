@@ -7,6 +7,7 @@ using TodoApp.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using TodoApp.Models;
+using Microsoft.AspNetCore.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,12 @@ builder.Services.AddDbContext<TodoDbContext>(options =>
 builder.Services.AddIdentity<User, IdentityRole<int>>()  // int türünde Id kullanýmý
     .AddEntityFrameworkStores<TodoDbContext>()
     .AddDefaultTokenProviders();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(30);  // Çerez süresini belirleyin, örneðin 30 dakika
+    options.SlidingExpiration = false;  // Kullanýcý aktif olsa bile oturum süresi uzatýlmaz
+});
 
 // Kullanýcý ve TodoItem Repository'leri
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -62,9 +69,11 @@ app.UseStaticFiles();
 // Routing middleware'i
 app.UseRouting();
 
+
 // Authentication ve Authorization middleware'lerini doðru sýrayla kullanýn
 app.UseAuthentication(); // Kimlik doðrulama iþlemi
 app.UseAuthorization();  // Yetkilendirme iþlemi
+
 
 // Default route
 app.MapControllerRoute(
