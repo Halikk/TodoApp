@@ -23,9 +23,6 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Index">Kullanıcılar</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="TodoItems" asp-action="Index">Yapılacak İşler Listesi</a>
-                        </li>
-                        <li class="nav-item">
                             <!-- Kullanıcı oturum açmamışsa Giriş ve Kayıt Ol linklerini göster -->
                             @if (!User.Identity.IsAuthenticated)
                             {
@@ -36,7 +33,7 @@
                             {
                                 <!-- Kullanıcı oturum açmışsa Çıkış butonunu göster -->
                                 <form asp-controller="Account" asp-action="Logout" method="post" style="display: inline;">
-                                    <a class="nav-link text-dark d-inline-block" asp-area="" asp-controller="TodoItems" asp-action="MyProjects">Yapacaklarım</a>
+                                    <a class="nav-link text-dark d-inline-block" asp-area="" asp-controller="TodoItems" asp-action="Index">Yapılacak İşler Listesi</a>
                                     <button type="submit" class="nav-link text-dark d-inline-block">Çıkış</button>
                                 </form>
                             }

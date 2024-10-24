@@ -157,13 +157,6 @@ namespace TodoApp.Controllers
             await _todoItemRepository.DeleteTodoItemAsync(id);
             return RedirectToAction(nameof(Index)); // Listeye geri döner
         }
-        public async Task<IActionResult> MyProjects()
-        {
-            var userId = int.Parse(_httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            var todoItems = await _todoItemRepository.GetTodoItemsByUserIdAsync(userId);
-            return View(todoItems);
-        }
-
         [HttpPost]
         public async Task<IActionResult> MarkAsCompleted(int id)
         {
@@ -175,5 +168,6 @@ namespace TodoApp.Controllers
             }
             return RedirectToAction("MyProjects");
         }
+
     }
 }

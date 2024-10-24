@@ -19,7 +19,6 @@ builder.Services.AddDbContext<TodoDbContext>(options =>
 builder.Services.AddIdentity<User, IdentityRole<int>>()  // int türünde Id kullanýmý
     .AddEntityFrameworkStores<TodoDbContext>()
     .AddDefaultTokenProviders();
-
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.ExpireTimeSpan = TimeSpan.FromMinutes(30);  // Çerez süresini belirleyin, örneðin 30 dakika
@@ -74,10 +73,20 @@ app.UseRouting();
 app.UseAuthentication(); // Kimlik doðrulama iþlemi
 app.UseAuthorization();  // Yetkilendirme iþlemi
 
+app.Use(async (context, next) =>
+{
+    if (context.User.Identity.IsAuthenticated)
+    {
+        await context.SignOutAsync();
+    }
+    await next.Invoke();
+});
 
 // Default route
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+
 
 app.Run();
