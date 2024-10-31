@@ -73,14 +73,6 @@ app.UseRouting();
 app.UseAuthentication(); // Kimlik doðrulama iþlemi
 app.UseAuthorization();  // Yetkilendirme iþlemi
 
-app.Use(async (context, next) =>
-{
-    if (context.User.Identity.IsAuthenticated)
-    {
-        await context.SignOutAsync();
-    }
-    await next.Invoke();
-});
 
 // Default route
 app.MapControllerRoute(

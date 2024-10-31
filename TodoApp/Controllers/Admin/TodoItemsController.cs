@@ -32,8 +32,17 @@ namespace TodoApp.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var todoItems = await _todoItemRepository.GetAllTodoItemsAsync();
-            return View(todoItems); // Tüm TodoItem'lar listesi görüntülenir
+            // Giriş yapan kullanıcının ID'sini al
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return RedirectToAction("Login", "Account"); // Eğer giriş yapılmadıysa login'e yönlendir
+            }
+
+            // Sadece bu kullanıcının to-do'larını getirin
+            var toDoItems = await _todoItemRepository.GetTodoItemsByUserIdAsync(user.Id);
+            return View(toDoItems);
+
         }
 
         // Yeni TodoItem oluşturma sayfasını gösterir
