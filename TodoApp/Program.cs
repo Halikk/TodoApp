@@ -45,9 +45,6 @@ builder.Services.AddControllersWithViews();
 // Swagger desteði
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddIdentity<IdentityUser, IdentityRole>()
-    .AddEntityFrameworkStores<TodoDbContext>()
-    .AddDefaultTokenProviders();
 
 var app = builder.Build();
 
@@ -88,24 +85,24 @@ app.MapControllerRoute(
 
 using (var scope = app.Services.CreateScope())
 {
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
 
     await SeedRolesAndAdminUser(roleManager, userManager);
 }
 
 app.Run();
-async Task SeedRolesAndAdminUser(RoleManager<IdentityRole> roleManager, UserManager<IdentityUser> userManager)
+async Task SeedRolesAndAdminUser(RoleManager<IdentityRole<int>> roleManager, UserManager<User> userManager)
 {
     // Admin rolünü oluþtur
     if (!await roleManager.RoleExistsAsync("Admin"))
     {
-        await roleManager.CreateAsync(new IdentityRole("Admin"));
+        await roleManager.CreateAsync(new IdentityRole<int>("Admin"));
     }
 
     // Kullanýcý rolünü oluþtur
     if (!await roleManager.RoleExistsAsync("User"))
     {
-        await roleManager.CreateAsync(new IdentityRole("User"));
+        await roleManager.CreateAsync(new IdentityRole<int>("User"));
     }
 }

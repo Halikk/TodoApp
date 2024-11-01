@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using TodoApp.Interfaces;
 using TodoApp.Models;
 using TodoApp.Repositories;
 
-
+[Authorize(Roles = "Admin")]
 [Route("admin/[controller]")]
 public class UsersController : Controller
 {

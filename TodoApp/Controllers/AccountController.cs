@@ -30,6 +30,7 @@ public class AccountController : Controller
     {
         if (ModelState.IsValid)
         {
+            var isFirstUser = !_userManager.Users.Any();  // Eğer hiç kullanıcı yoksa bu ilk kullanıcıdır
             var user = new User
             {
                 UserName = model.UserName,
@@ -43,8 +44,10 @@ public class AccountController : Controller
 
             if (result.Succeeded)
             {
+                
+                var role = isFirstUser ? "Admin" : "User";  // İlk kullanıcıya Admin rolünü ver, diğerlerine User rolünü ver
                 // Kullanıcıya "User" rolünü atayın
-                await _userManager.AddToRoleAsync(user, "User");
+                await _userManager.AddToRoleAsync(user, role);
 
                 // Kullanıcıyı oturum açmış şekilde sisteme alın
                 await _signInManager.SignInAsync(user, isPersistent: false);
@@ -76,25 +79,26 @@ public class AccountController : Controller
     {
         if (ModelState.IsValid)
         {
-            // Kullanıcıyı e-posta ile bul
-            var user = await _userRepository.GetUserByEmailAsync(model.Email);
+            // Kullanıcıyı kullanıcı adı veya e-posta ile bul
+            var user = await _userManager.FindByEmailAsync(model.Email);
+
+
             if (user != null)
             {
-                // Şifreyi doğrula
-                bool isPasswordValid = BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash);
-                if (isPasswordValid)
+                // Kullanıcının şifresini doğrula
+                var result = await _signInManager.PasswordSignInAsync(user, model.Password, isPersistent: model.RememberMe, lockoutOnFailure: false);
+                if (result.Succeeded)
                 {
-                    // Giriş işlemini gerçekleştir
-                    await _signInManager.SignInAsync(user, isPersistent: model.RememberMe);
                     return RedirectToAction("Index", "Home");
                 }
             }
 
             // Geçersiz giriş denemesi
-            ModelState.AddModelError(string.Empty, "Geçersiz giriş denemesi.");
+            ModelState.AddModelError(string.Empty, "Geçersiz kullanıcı adı veya şifre.");
         }
         return View(model);
     }
+
 
 
     [HttpPost]
