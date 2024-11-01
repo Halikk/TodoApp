@@ -7,6 +7,7 @@ using TodoApp.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using TodoApp.Models;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +20,7 @@ builder.Services.AddDbContext<TodoDbContext>(options =>
 builder.Services.AddIdentity<User, IdentityRole<int>>()  // int türünde Id kullanýmý
     .AddEntityFrameworkStores<TodoDbContext>()
     .AddDefaultTokenProviders();
+
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.ExpireTimeSpan = TimeSpan.FromMinutes(30);  // Çerez süresini belirleyin, örneðin 30 dakika
@@ -42,6 +44,10 @@ builder.Services.AddControllersWithViews();
 
 // Swagger desteði
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+    .AddEntityFrameworkStores<TodoDbContext>()
+    .AddDefaultTokenProviders();
 
 var app = builder.Build();
 
@@ -74,11 +80,32 @@ app.UseAuthentication(); // Kimlik doðrulama iþlemi
 app.UseAuthorization();  // Yetkilendirme iþlemi
 
 
+
 // Default route
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
 
+    await SeedRolesAndAdminUser(roleManager, userManager);
+}
 
 app.Run();
+async Task SeedRolesAndAdminUser(RoleManager<IdentityRole> roleManager, UserManager<IdentityUser> userManager)
+{
+    // Admin rolünü oluþtur
+    if (!await roleManager.RoleExistsAsync("Admin"))
+    {
+        await roleManager.CreateAsync(new IdentityRole("Admin"));
+    }
+
+    // Kullanýcý rolünü oluþtur
+    if (!await roleManager.RoleExistsAsync("User"))
+    {
+        await roleManager.CreateAsync(new IdentityRole("User"));
+    }
+}

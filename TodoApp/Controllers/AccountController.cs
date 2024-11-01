@@ -7,11 +7,13 @@ using BCrypt.Net;
 
 public class AccountController : Controller
 {
+    private readonly UserManager<User> _userManager;
     private readonly IUserRepository _userRepository;
     private readonly SignInManager<User> _signInManager;
 
-    public AccountController(IUserRepository userRepository, SignInManager<User> signInManager)
+    public AccountController(IUserRepository userRepository, SignInManager<User> signInManager, UserManager<User> userManager)
     {
+        _userManager = userManager;
         _userRepository = userRepository;
         _signInManager = signInManager;
     }
@@ -32,19 +34,35 @@ public class AccountController : Controller
             {
                 UserName = model.UserName,
                 Email = model.Email,
-                SecurityStamp = Guid.NewGuid().ToString(),
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password) // Şifreyi hashleyin
-            }; 
+                SecurityStamp = Guid.NewGuid().ToString()
+                // PasswordHash'i burada manuel olarak set etmeye gerek yok, UserManager bu işlemi yapar
+            };
 
             // Kullanıcıyı veritabanına kaydedin
-            await _userRepository.AddUserAsync(user);
+            var result = await _userManager.CreateAsync(user, model.Password);
 
-            // Kullanıcıyı oturum açmış şekilde sisteme alın
-            await _signInManager.SignInAsync(user, isPersistent: false);
-            return RedirectToAction("Index", "Home");
+            if (result.Succeeded)
+            {
+                // Kullanıcıya "User" rolünü atayın
+                await _userManager.AddToRoleAsync(user, "User");
+
+                // Kullanıcıyı oturum açmış şekilde sisteme alın
+                await _signInManager.SignInAsync(user, isPersistent: false);
+                return RedirectToAction("Index", "Home");
+            }
+
+            // Eğer kullanıcı oluşturma başarısızsa, hataları ModelState'e ekleyin
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
         }
+
+        // ModelState geçersizse veya kullanıcı oluşturulamadıysa formu tekrar gösterin
         return View(model);
     }
+
+
 
 
     [HttpGet]
