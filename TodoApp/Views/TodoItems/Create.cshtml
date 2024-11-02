@@ -21,14 +21,11 @@
 
     </div>
 
-    <div class="form-group">
-        <label for="UserId">Kullanıcı</label>
-        <input type="number" class="form-control" id="UserId" name="UserId" value="@Model?.UserRef" required />
-    </div>
-    <div class="form-group">
-        <label asp-for="IsCompleted"></label>
-        @Html.DropDownListFor(model => model.IsCompleted, (IEnumerable<SelectListItem>)ViewBag.IsCompletedList, "Seçiniz", new { @class = "form-control" })
-        <span asp-validation-for="IsCompleted" class="text-danger"></span>
+    <div class="form-group form-check">
+        <label class="form-check-label">
+            @Html.CheckBoxFor(model => model.IsCompleted, new { @class = "form-check-input" })
+            Tamamlandı mı?
+        </label>
     </div>
     <button type="submit" class="btn btn-primary">Kaydet</button>
     <a href="@Url.Action("Index")" class="btn btn-secondary">İptal</a>

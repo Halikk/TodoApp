@@ -91,10 +91,19 @@ public class AccountController : Controller
                 {
                     return RedirectToAction("Index", "Home");
                 }
+                if (result.IsLockedOut)
+                {
+                    ModelState.AddModelError(string.Empty, "Hesabınız kilitlenmiş durumda.");
+                }
+                else if (result.IsNotAllowed)
+                {
+                    ModelState.AddModelError(string.Empty, "Giriş izni bulunmamaktadır.");
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Geçersiz kullanıcı adı veya şifre.");
+                }
             }
-
-            // Geçersiz giriş denemesi
-            ModelState.AddModelError(string.Empty, "Geçersiz kullanıcı adı veya şifre.");
         }
         return View(model);
     }

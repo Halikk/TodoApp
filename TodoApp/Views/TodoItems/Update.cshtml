@@ -19,11 +19,13 @@
         <textarea class="form-control" id="Description" name="Description" rows="3" required>@Model.Description</textarea>
     </div>
 
-    <div class="form-group">
-        <label asp-for="IsCompleted"></label>
-        @Html.DropDownListFor(model => model.IsCompleted, (IEnumerable<SelectListItem>)ViewBag.IsCompletedList, new { @class = "form-control" })
-        <span asp-validation-for="IsCompleted" class="text-danger"></span>
+    <div class="form-group form-check">
+        <label class="form-check-label">
+            @Html.CheckBoxFor(model => model.IsCompleted, new { @class = "form-check-input" })
+            Tamamlandı mı?
+        </label>
     </div>
+
 
     <div class="form-group">
         <label for="DueDate">Bitiş Tarihi</label>

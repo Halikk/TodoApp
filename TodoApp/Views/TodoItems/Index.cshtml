@@ -21,7 +21,12 @@
             <tr>
                 <td>@item.Title</td>
                 <td>@item.Description</td>
-                <td>@(item.IsCompleted == true ? "Evet" : "Hayır")</td>
+                <td>
+                    <form asp-action="ToggleCompletion" method="post" style="display:inline;">
+                        <input type="hidden" name="id" value="@item.TodoItemId" />
+                        <input type="checkbox" onclick="this.form.submit();" @(item.IsCompleted ? "checked" : "") />
+                    </form>
+                </td>
                 <td>
                     <a href="@Url.Action("Update", new { id = item.TodoItemId })">Düzenle</a> |
                     <a href="@Url.Action("Delete", new { id = item.TodoItemId })">Sil</a>

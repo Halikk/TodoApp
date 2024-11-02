@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Identity;
 namespace TodoApp.Controllers
 {
     [Authorize]
-    [Route("admin/[controller]")]
+    [Route("[controller]")]
     public class TodoItemsController : Controller
     {
         private readonly ITodoItemRepository _todoItemRepository;
@@ -25,10 +25,7 @@ namespace TodoApp.Controllers
             _httpContextAccessor = httpContextAccessor;
             _userManager = userManager;
         }
-       
 
-
-        // Tüm TodoItem'ları listelemek için Index view'ı döner
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -39,23 +36,34 @@ namespace TodoApp.Controllers
                 return RedirectToAction("Login", "Account"); // Eğer giriş yapılmadıysa login'e yönlendir
             }
 
-            // Sadece bu kullanıcının to-do'larını getirin
-            var toDoItems = await _todoItemRepository.GetTodoItemsByUserIdAsync(user.Id);
-            return View(toDoItems);
+            IEnumerable<TodoItem> toDoItems;
 
+            // Eğer kullanıcı adminse tüm to-do öğelerini getirin, değilse sadece kendi öğelerini getirin
+            if (User.IsInRole("Admin"))
+            {
+                toDoItems = await _todoItemRepository.GetAllTodoItemsAsync();
+            }
+            else
+            {
+                toDoItems = await _todoItemRepository.GetTodoItemsByUserIdAsync(user.Id);
+            }
+
+            return View(toDoItems);
         }
+
 
         // Yeni TodoItem oluşturma sayfasını gösterir
         [HttpGet("create")]
         public IActionResult Create()
         {
-            ViewBag.IsCompletedList = new SelectList(new List<SelectListItem>
+            // IsCompleted için seçenek listesi oluşturun
+            ViewBag.IsCompletedList = new List<SelectListItem>
     {
         new SelectListItem { Text = "Evet", Value = "true" },
         new SelectListItem { Text = "Hayır", Value = "false" }
-    }, "Value", "Text");
+    };
 
-            return View(); // Boş form döndürür
+            return View();
         }
 
         // Yeni TodoItem oluşturma işlemi
@@ -166,17 +174,20 @@ namespace TodoApp.Controllers
             await _todoItemRepository.DeleteTodoItemAsync(id);
             return RedirectToAction(nameof(Index)); // Listeye geri döner
         }
+
         [HttpPost]
-        public async Task<IActionResult> MarkAsCompleted(int id)
+        public async Task<IActionResult> ToggleCompletion(int id)
         {
             var todoItem = await _todoItemRepository.GetTodoItemByIdAsync(id);
-            if (todoItem != null && todoItem.UserRef == int.Parse(_httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value))
+
+            if (todoItem != null)
             {
-                todoItem.IsCompleted = !todoItem.IsCompleted;
+                todoItem.IsCompleted = !todoItem.IsCompleted; // Durumu tersine çevir
                 await _todoItemRepository.UpdateTodoItemAsync(todoItem);
             }
-            return RedirectToAction("MyProjects");
-        }
 
+            return RedirectToAction(nameof(Index));
+        }
     }
+
 }
