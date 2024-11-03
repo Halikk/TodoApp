@@ -12,6 +12,10 @@
             <th>Başlık</th>
             <th>Açıklama</th>
             <th>Tamamlandı mı?</th>
+            @if (User.IsInRole("Admin"))
+            {
+                <th>Sahibi</th> <!-- Yalnızca Admin rolündeki kullanıcılar görür -->
+            }
             <th>İşlemler</th>
         </tr>
     </thead>
@@ -27,6 +31,10 @@
                         <input type="checkbox" onclick="this.form.submit();" @(item.IsCompleted ? "checked" : "") />
                     </form>
                 </td>
+                @if (User.IsInRole("Admin"))
+                {
+                    <td>@item.User?.UserName</td> <!-- Kullanıcı adı yalnızca admin için gösterilir -->
+                }
                 <td>
                     <a href="@Url.Action("Update", new { id = item.TodoItemId })">Düzenle</a> |
                     <a href="@Url.Action("Delete", new { id = item.TodoItemId })">Sil</a>

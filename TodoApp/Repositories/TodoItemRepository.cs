@@ -15,7 +15,9 @@ namespace TodoApp.Repositories
 
         public async Task<IEnumerable<TodoItem>> GetAllTodoItemsAsync()
         {
-            return await _context.TodoItems.ToListAsync();
+            return await _context.TodoItems
+        .Include(t => t.User) // User bilgilerini dahil et
+        .ToListAsync();
         }
 
         public async Task<TodoItem> GetTodoItemByIdAsync(int id)

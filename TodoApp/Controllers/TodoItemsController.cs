@@ -56,13 +56,6 @@ namespace TodoApp.Controllers
         [HttpGet("create")]
         public IActionResult Create()
         {
-            // IsCompleted için seçenek listesi oluşturun
-            ViewBag.IsCompletedList = new List<SelectListItem>
-    {
-        new SelectListItem { Text = "Evet", Value = "true" },
-        new SelectListItem { Text = "Hayır", Value = "false" }
-    };
-
             return View();
         }
 
@@ -105,13 +98,6 @@ namespace TodoApp.Controllers
                 return NotFound();
             }
 
-            // Dropdown için seçenekleri ayarlıyoruz (true = Evet, false = Hayır)
-            ViewBag.IsCompletedList = new List<SelectListItem>
-    {
-        new SelectListItem { Text = "Evet", Value = "true", Selected = todoItem.IsCompleted },
-        new SelectListItem { Text = "Hayır", Value = "false", Selected = !todoItem.IsCompleted }
-    };
-
             return View(todoItem);
         }
 
@@ -142,13 +128,6 @@ namespace TodoApp.Controllers
                     ModelState.AddModelError("", "Kullanıcı bulunamadı.");
                 }
             }
-
-            // Eğer validasyon hatası varsa, dropdown listesi yeniden doldurulmalı
-            ViewBag.IsCompletedList = new List<SelectListItem>
-    {
-        new SelectListItem { Text = "Evet", Value = "true", Selected = todoItem.IsCompleted },
-        new SelectListItem { Text = "Hayır", Value = "false", Selected = !todoItem.IsCompleted }
-    };
 
             return View(todoItem);
         }
